@@ -1,2 +1,9 @@
 .idea
 *.iml
+
+authorization_server/target/
+authorization_server/*.iml
+
+resource_server/target/
+resource_server/*.iml
+

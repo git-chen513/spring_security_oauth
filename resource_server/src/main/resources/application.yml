@@ -1,0 +1,9 @@
+server:
+  port: 9002
+  servlet:
+    context-path: /resource
+
+spring:
+  application:
+    name: resource-server
+
