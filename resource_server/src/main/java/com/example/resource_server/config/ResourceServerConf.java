@@ -22,8 +22,7 @@ public class ResourceServerConf extends ResourceServerConfigurerAdapter {
 
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
-        // TODO 验证这里设置的资源服务id是否需要和授权服务器配置的资源服务id对应上
-        resources.resourceId("test") // 代表这个资源服务的id，是可选的
+        resources.resourceId("resource-server") // 代表这个资源服务器的id，是可选的，不配置会有默认值，建议配置上
                 .tokenServices(tokenServices()) // 配置如何验证令牌
                 .stateless(true); // 无状态模式，不启用session
     }

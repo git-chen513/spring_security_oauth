@@ -63,7 +63,10 @@ public class OauthServerConf extends AuthorizationServerConfigurerAdapter {
                 // TODO 加密后的secret有问题
                 // .secret(new BCryptPasswordEncoder().encode("secret")) // client_secret
                 .secret("secret")
-                .resourceIds("test") // 客户端拥有的资源列表
+                // 代表客户端可以访问的资源服务器列表，当使用该客户端申请到的令牌访问资源服务器时
+                // 资源服务器会进行校验，如果该客户端可以访问的资源服务器列表不包含当前资源服务器，则拒绝访问
+                // 该配置是可选的，不进行配置时，默认该客户端可以访问所有资源服务器
+                .resourceIds("resource-server", "test")
                 .authorizedGrantTypes("authorization_code", "password",
                         "client_credentials", "implicit", "refresh_token") // 允许的授权类型
                 .scopes("all") // 允许的授权范围
