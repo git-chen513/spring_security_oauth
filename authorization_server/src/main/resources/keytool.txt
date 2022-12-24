@@ -1,0 +1,12 @@
+keytool是jdk自带的一个工具，可以用于生成密钥对。
+
+1. 生成jks文件/私钥：
+keytool -genkey -alias jwt -keyalg RSA -keystore jwt.jks -validity 36500 -keypass test123 -storepass test123
+
+2. 获取jks文件对应的公钥：
+keytool -list -rfc --keystore jwt.jks | openssl x509 -inform pem -pubkey
+
+3. 参考文档：
+https://blog.csdn.net/HD243608836/article/details/109105540
+https://blog.csdn.net/qq_38225558/article/details/125262117
+https://fanfanzhisu.blog.csdn.net/article/details/106676135

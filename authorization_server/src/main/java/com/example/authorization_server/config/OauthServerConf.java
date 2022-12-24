@@ -1,11 +1,9 @@
 package com.example.authorization_server.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
@@ -13,10 +11,9 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
-import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
-import org.springframework.security.oauth2.provider.code.InMemoryAuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
-import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
+import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
+
 
 /**
  * 授权服务器配置类
@@ -42,13 +39,23 @@ public class OauthServerConf extends AuthorizationServerConfigurerAdapter {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    @Autowired
+    private TokenStore tokenStore;
+
+    @Autowired
+    private JwtAccessTokenConverter jwtAccessTokenConverter;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     /***
      * 配置令牌端点的安全约束
      */
     @Override
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
         security
-                //.tokenKeyAccess("permitAll()") // 使用jwt令牌需要用到的提供公有密钥的端点：/oauth/token_key
+                //.tokenKeyAccess("isAuthenticated()") // 用于资源服务器远程获取JWT公钥的端点：/oauth/token_key
+                .tokenKeyAccess("permitAll()")
                 .checkTokenAccess("permitAll()") // 配置验证令牌端点：/oauth/check_token允许访问
                 .allowFormAuthenticationForClients().passwordEncoder(NoOpPasswordEncoder.getInstance()); // 允许以表单认证的方式申请令牌，而不仅仅是 Basic Auth 方式
     }
@@ -61,18 +68,17 @@ public class OauthServerConf extends AuthorizationServerConfigurerAdapter {
         clients.inMemory() // 内存方式
                 .withClient("c1") // client_id
                 // TODO 加密后的secret有问题
-                // .secret(new BCryptPasswordEncoder().encode("secret")) // client_secret
+                // .secret(passwordEncoder.encode("secret")) // client_secret
                 .secret("secret")
                 // 代表客户端可以访问的资源服务器列表，当使用该客户端申请到的令牌访问资源服务器时
                 // 资源服务器会进行校验，如果该客户端可以访问的资源服务器列表不包含当前资源服务器，则拒绝访问
                 // 该配置是可选的，不进行配置时，默认该客户端可以访问所有资源服务器
-                .resourceIds("resource-server", "test")
+                .resourceIds("resource-server")
                 .authorizedGrantTypes("authorization_code", "password",
-                        "client_credentials", "implicit", "refresh_token") // 允许的授权类型
+                        "client_credentials", "implicit", "refresh_token") // 该客户端允许的授权类型
                 .scopes("all") // 允许的授权范围
-                .autoApprove(false) // 是否自动授权
+                .autoApprove(true) // 是否自动授权
                 .redirectUris("http://www.baidu.com"); // 回调地址
-
     }
 
     /***
@@ -82,26 +88,8 @@ public class OauthServerConf extends AuthorizationServerConfigurerAdapter {
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
         endpoints
                 .authenticationManager(authenticationManager)
-                .tokenStore(tokenStore())
-                .authorizationCodeServices(authorizationCodeServices())
+                .tokenStore(tokenStore)
+                .accessTokenConverter(jwtAccessTokenConverter)
                 .userDetailsService(userDetailsService);
-    }
-
-    /***
-     * 配置令牌存储策略
-     */
-    @Bean
-    public TokenStore tokenStore() {
-        // 使用内存存储令牌
-        return new InMemoryTokenStore();
-    }
-
-    /***
-     * 配置授权码模式的授权码如何保存
-     */
-    @Bean
-    public AuthorizationCodeServices authorizationCodeServices() {
-        // 使用内存存储授权码
-        return new InMemoryAuthorizationCodeServices();
     }
 }
