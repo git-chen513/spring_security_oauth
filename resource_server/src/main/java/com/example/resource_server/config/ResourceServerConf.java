@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.R
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.DefaultUserAuthenticationConverter;
+import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 
@@ -67,8 +68,8 @@ public class ResourceServerConf extends ResourceServerConfigurerAdapter {
      */
     @Bean
     public ResourceServerTokenServices tokenServices() {
-        // RemoteTokenServices services = new RemoteTokenServices();
-        CustomRemoteTokenServices services = new CustomRemoteTokenServices();
+        RemoteTokenServices services = new RemoteTokenServices();
+        //CustomRemoteTokenServices services = new CustomRemoteTokenServices();
         services.setCheckTokenEndpointUrl(introspectionUri);
         services.setClientId(clientId);
         services.setClientSecret(clientSecret);

@@ -28,14 +28,22 @@ public class CustomJwtAccessTokenConverter extends JwtAccessTokenConverter {
 
     @Override
     public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
-        OAuth2AccessToken token = super.enhance(accessToken, authentication);
-        if (token instanceof DefaultOAuth2AccessToken) {
-            DefaultOAuth2AccessToken defaultToken = (DefaultOAuth2AccessToken) token;
+//        OAuth2AccessToken token = super.enhance(accessToken, authentication);
+//        if (token instanceof DefaultOAuth2AccessToken) {
+//            DefaultOAuth2AccessToken defaultToken = (DefaultOAuth2AccessToken) token;
+//            Map<String, ?> m = this.convertAccessToken(accessToken, authentication);
+//            defaultToken.getAdditionalInformation().putAll(m);
+//            // defaultToken.getAdditionalInformation().remove("scope");
+//            return defaultToken;
+//        }
+//        return token;
+
+        if (accessToken instanceof DefaultOAuth2AccessToken) {
             Map<String, ?> m = this.convertAccessToken(accessToken, authentication);
-            defaultToken.getAdditionalInformation().putAll(m);
-            // defaultToken.getAdditionalInformation().remove("scope");
-            return defaultToken;
+            ((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation((Map<String, Object>)m);
+            OAuth2AccessToken resultToken = super.enhance(accessToken, authentication);
+            return resultToken;
         }
-        return token;
+        return accessToken;
     }
 }

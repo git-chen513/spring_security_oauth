@@ -15,6 +15,7 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 
 
+
 /**
  * 授权服务器配置类
  *
@@ -86,6 +87,7 @@ public class OauthServerConf extends AuthorizationServerConfigurerAdapter {
      */
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+
         endpoints
                 .authenticationManager(authenticationManager)
                 .tokenStore(tokenStore)
